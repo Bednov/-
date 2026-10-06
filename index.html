@@ -215,20 +215,6 @@
 
   let isTransitioning = false; 
 
-  function generateLegalBasis(qText) {
-    const text = qText.toLowerCase();
-    if (text.includes("наследств") || text.includes("завещ") || text.includes("открыт")) {
-      return { rule: "Гражданский кодекс РФ (Раздел V. Наследственное право)", logic: "Регулирует порядок наследования, пресекательные сроки принятия и права обязательных наследников." };
-    }
-    if (text.includes("доверенност") || text.includes("представитель") || text.includes("полномоч")) {
-      return { rule: "Гл. 10 Гражданского кодекса РФ", logic: "Устанавливает требования к нотариальной форме доверенностей и правила их отмены в ЕИС." };
-    }
-    if (text.includes("супруг") || text.includes("брачн") || text.includes("брак")) {
-      return { rule: "Семейный кодекс РФ (гл. 7-8 СК РФ)", logic: "Определяет законный и договорный режим имущества супругов, правила раздела совместной собственности." };
-    }
-    return { rule: "Основы законодательства РФ о нотариате", logic: "Регламентирует правила совершения нотариальных действий и проверку законности сделок." };
-  }
-
   let RAW_EXCEL_TESTS = [];
   let TASKS_DATABASE = [];
   const DEFAULT_STATE = { currentIndex: 0, totalAnswered: 0, correctCount: 0, errorIds: [], sessionQueue: [] };
@@ -288,13 +274,7 @@
     }, 1000);
 
     let shuffledTests = [...RAW_EXCEL_TESTS].sort(() => Math.random() - 0.5).slice(0, 50);
-    let shuffledTasks = [...TASKS_DATABASE].sort(() => Math.random() - 0.5);
-    let chosenTask = shuffledTasks.length > 0 ? shuffledTasks[0] : null;
-
-    let examQueue = shuffledTests.map((q, idx) => ({ ...q, isTaskItem: false, topic: `⏱️ Экзамен: Тест ${idx + 1} из 50` }));
-    if (chosenTask) {
-      examQueue.push({ ...chosenTask, isTaskItem: true, topic: `⏱️ Экзамен: Практическая задача (№51)` });
-    }
+    let examQueue = shuffledTests.map((q, idx) => ({ ...q, isTaskItem: false, topic: `⏱️ Экзамен: Задача ${idx + 1}` }));
 
     AppState.sessionQueue = examQueue;
     AppState.currentIndex = 0;
@@ -317,9 +297,7 @@
         <div class="verdict-badge ${isPassed ? 'passed' : 'failed'}">${isPassed ? 'СДАЛ' : 'НЕ СДАН'}</div>
         <h3 style="margin: 10px 0;">Набранный балл: ${totalPoints} из 60</h3>
         <div style="text-align: left; background: #0f172a; padding: 14px; border-radius: 10px; font-size: 0.88em; margin-bottom: 15px; line-height:1.4;">
-          <p>🔹 Правильные ответы в тестах: <b style="color:var(--accent-cyan);">${examScore.testPoints}</b> из 50 б.</p>
-          <p>🔹 Правильное решение задачи: <b style="color:var(--success-green);">${examScore.taskPoint}</b> из 5 б.</p>
-          <p>🔹 Обоснование нормами права: <b style="color:var(--warning-amber);">${examScore.argPoints}</b> из 5 б.</p>
+          <p>🔹 Правильные ответы: <b style="color:var(--accent-cyan);">${examScore.testPoints}</b></p>
         </div>
         <button class="nav-btn home-btn" style="width: 100%; padding:14px;" onclick="isExamMode=false; buildSessionQueue(); renderCurrentQuestion();">Вернуться к тренировке</button>
       </div>
@@ -333,33 +311,37 @@
     if (el) el.innerText = `Начислено: ${points} б.`;
   }
 
+  // Обновленный парсер под теги <Задача №>, <Задача>, <Варианты ответа>, <Правильный ответ>, <Обоснование>
   function parseTextData(fullText) {
     const lines = fullText.split('\n').map(l => l.trim()).filter(Boolean);
     let parsedData = [];
     let currentQ = null;
 
-    lines.forEach((line, idx) => {
-      if (line.startsWith('<Вопрос №>') || line.startsWith('<Вопрос>:')) {
+    lines.forEach((line) => {
+      if (line.startsWith('<Задача №>')) {
         if (currentQ && currentQ.options.length > 0) {
           parsedData.push(currentQ);
         }
-        const text = line.replace(/^<[^>]+>:\s*/, '');
+        const numMatch = line.match(/:?\s*(\d+)/);
+        const qId = numMatch ? parseInt(numMatch[1], 10) : (1000 + parsedData.length);
         currentQ = { 
-          id: 1000 + parsedData.length,
-          topic: "Основная база (READMY1)",
-          title: text, 
-          question: text,
+          id: qId,
+          topic: "Задачи нотариуса",
+          title: "", 
+          question: "",
           options: [], 
           correct: 0,
           correctIndex: 0,
-          legalBasis: generateLegalBasis(text)
+          legalBasis: { rule: "Законодательство РФ о нотариате", logic: "Материал квалификационного экзамена." }
         };
-      } else if (line.startsWith('<Вопрос>')) {
-        const text = line.replace(/^<[^>]+>:\s*/, '');
+      } else if (line.startsWith('<Задача>:')) {
+        const text = line.replace(/^<Задача>:\s*/, '');
         if (currentQ) {
-          currentQ.title += (currentQ.title ? "\n" : "") + text;
-          currentQ.question = currentQ.title;
+          currentQ.title = text;
+          currentQ.question = text;
         }
+      } else if (line.startsWith('<Варианты ответа>')) {
+        // Заголовок вариантов, пропускаем
       } else if (/^<\d+>:/.test(line)) {
         const optText = line.replace(/^<\d+>:\s*/, '');
         if (currentQ) {
@@ -371,12 +353,19 @@
           currentQ.correct = parseInt(match[1], 10) - 1;
           currentQ.correctIndex = currentQ.correct;
         }
+      } else if (line.startsWith('<Обоснование>')) {
+        const text = line.replace(/^<Обоснование>:\s*/, '');
+        if (currentQ) {
+          currentQ.legalBasis.rule = text;
+        }
       } else if (currentQ) {
-        if (currentQ.options.length > 0) {
+        if (currentQ.options.length > 0 && currentQ.options.length <= 4 && !line.startsWith('<')) {
           currentQ.options[currentQ.options.length - 1] += " " + line;
-        } else if (!line.startsWith('<Варианты ответа>') && !line.startsWith('<Обоснование>')) {
-          currentQ.title += "\n" + line;
+        } else if (!currentQ.title) {
+          currentQ.title += (currentQ.title ? "\n" : "") + line;
           currentQ.question = currentQ.title;
+        } else if (currentQ.legalBasis && currentQ.legalBasis.rule) {
+          currentQ.legalBasis.rule += " " + line;
         }
       }
     });
@@ -387,7 +376,6 @@
     return parsedData;
   }
 
-  // Загрузка через READMY1.md с поддержкой mammoth / text
   async function loadReadmeAndInit() {
     AppState.totalAnswered = SavedProgressState.totalAnswered;
     AppState.correctCount = SavedProgressState.correctCount;
@@ -476,32 +464,15 @@
       </button>
     `).join('');
 
-    let extraTaskPanel = "";
-    if (q.isTaskItem) {
-      extraTaskPanel = `
-        <div class="task-score-panel">
-          <b>🏅 Оценка экспертной аргументации билета (до 5 баллов):</b>
-          <div style="margin-top:6px; display:flex; gap:6px; justify-content:center;">
-            <button class="pill-btn" onclick="setArgumentationPoints(1)">1 б</button>
-            <button class="pill-btn" onclick="setArgumentationPoints(3)">3 б</button>
-            <button class="pill-btn" onclick="setArgumentationPoints(5)">5 б</button>
-          </div>
-          <div id="arg-status" style="margin-top:5px; font-weight:700; color:var(--warning-amber);">Решение не оценено</div>
-        </div>
-      `;
-    }
-
     root.innerHTML = `
       <div class="question-text">${q.question || q.title}</div>
       <div class="answers-container">${optionsHTML}</div>
       <button class="pill-btn" style="margin-top: 12px; width: 100%; text-align: center; padding:8px;" onclick="toggleLegalHint()">
-        ⚖️️ Развёрнутое правовое обоснование
+        ⚖ Развёрнутое правовое обоснование
       </button>
       <div id="legal-hint-card" class="legal-analysis-box">
-        <p style="margin: 0 0 4px 0;"><b>📜 Закон:</b> ${q.legalBasis ? q.legalBasis.rule : "Законодательство РФ"}</p>
-        <p style="margin: 0;"><b>🧠 Логика:</b> ${q.legalBasis ? q.legalBasis.logic : "Материал квалификационного теста нотариуса."}</p>
+        <p style="margin: 0 0 4px 0;"><b>📜 Обоснование:</b> ${q.legalBasis ? q.legalBasis.rule : "Законодательство РФ"}</p>
       </div>
-      ${extraTaskPanel}
     `;
     
     document.getElementById('quiz-card-element').scrollTop = 0;
@@ -528,12 +499,7 @@
       }
 
       if (isExamMode) {
-        const item = AppState.sessionQueue[AppState.currentIndex];
-        if (item && item.isTaskItem) {
-          examScore.taskPoint = 5; 
-        } else {
-          examScore.testPoints += 1; 
-        }
+        examScore.testPoints += 1; 
       }
 
       setTimeout(navigateNext, 350);
