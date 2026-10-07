@@ -122,6 +122,7 @@
     <div class="brand-title" onclick="openRandomTask()">⚖️ Нотариус Pro 🔀</div>
     <div id="exam-timer-display">60:00</div>
     <div style="display: flex; gap: 4px;">
+      <button class="pill-btn" id="sound-toggle-btn" onclick="toggleSound()">🔊 Звук</button>
       <button class="pill-btn exam-btn" onclick="startOfficialExamMode()">⏱️ Билет (50+1)</button>
       <button class="pill-btn" onclick="openTopicsModal()">📚 Темы</button>
       <button class="pill-btn" onclick="resetFullState()" style="color: var(--error-red);">🗑️ Сброс</button>
@@ -170,6 +171,22 @@
 </div>
 
 <script>
+  let isSoundEnabled = JSON.parse(localStorage.getItem('notary_sound_enabled')) !== false;
+
+  function toggleSound() {
+    isSoundEnabled = !isSoundEnabled;
+    localStorage.setItem('notary_sound_enabled', JSON.stringify(isSoundEnabled));
+    updateSoundButtonUI();
+  }
+
+  function updateSoundButtonUI() {
+    const btn = document.getElementById('sound-toggle-btn');
+    if (btn) {
+      btn.innerText = isSoundEnabled ? '🔊 Звук' : '🔇 Без звука';
+      btn.style.opacity = isSoundEnabled ? '1' : '0.6';
+    }
+  }
+
   const AudioEngine = {
     ctx: null,
     init() {
@@ -179,6 +196,7 @@
       }
     },
     playCorrect() {
+      if (!isSoundEnabled) return;
       try {
         this.init();
         if (!this.ctx) return;
@@ -195,6 +213,7 @@
       } catch(e) {}
     },
     playWrong() {
+      if (!isSoundEnabled) return;
       try {
         this.init();
         if (!this.ctx) return;
@@ -304,6 +323,30 @@
     isExamMode = false;
   }
 
+  function cleanQuestionData(q) {
+    if (!q || !q.options) return q;
+    let extractedExplanation = "";
+    q.options = q.options.map(opt => {
+      const match = opt.match(/^(.*?)\s*(Пояснени[яе]?:?[\s\S]*)$/i);
+      if (match) {
+        if (match[2]) {
+          extractedExplanation += (extractedExplanation ? "\n" : "") + match[2].trim();
+        }
+        return match[1].trim();
+      }
+      return opt;
+    });
+    if (extractedExplanation) {
+      q.legalBasis = q.legalBasis || {};
+      if (q.legalBasis.explanation) {
+        q.legalBasis.explanation += "\n" + extractedExplanation;
+      } else {
+        q.legalBasis.explanation = extractedExplanation;
+      }
+    }
+    return q;
+  }
+
   // Сверхгибкий парсер, поддерживающий `<Задача№>`, `<Задача>`, варианты и ответы независимо от пробелов
   function parseTextData(fullText) {
     const lines = fullText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -315,6 +358,7 @@
 
       if (normalized.startsWith('<Задача№>')) {
         if (currentQ && currentQ.options.length > 0) {
+          cleanQuestionData(currentQ);
           parsedData.push(currentQ);
         }
         const matchNum = line.match(/\d+/);
@@ -366,6 +410,7 @@
     });
 
     if (currentQ && currentQ.options.length > 0) {
+      cleanQuestionData(currentQ);
       parsedData.push(currentQ);
     }
     return parsedData;
@@ -467,6 +512,7 @@
       </button>
       <div id="legal-hint-card" class="legal-analysis-box">
         <p style="margin: 0 0 4px 0;"><b>📜 Обоснование:</b> ${q.legalBasis ? q.legalBasis.rule : "Законодательство РФ"}</p>
+        ${q.legalBasis && q.legalBasis.explanation ? `<p style="margin: 6px 0 0 0; border-top: 1px dashed var(--border-color); padding-top: 6px; white-space: pre-line;"><b>💡 ${q.legalBasis.explanation}</b></p>` : ''}
       </div>
     `;
     
@@ -496,15 +542,12 @@
       if (isExamMode) {
         examScore.testPoints += 1; 
       }
-
-      setTimeout(navigateNext, 350);
     } else {
       if (!AppState.errorIds.includes(qId)) AppState.errorIds.push(qId);
       if (btnElement) btnElement.classList.add('wrong');
       if (allButtons[correctIdx]) allButtons[correctIdx].classList.add('correct');
       AudioEngine.playWrong();
       document.getElementById('legal-hint-card').style.display = 'block';
-      setTimeout(() => { isTransitioning = false; }, 600);
     }
     syncStateToStorage();
   }
@@ -579,7 +622,10 @@
   function closeTopicsModal() { document.getElementById('topics-modal').style.display = 'none'; }
   function selectTopicBlock(t) { buildSessionQueue(t); renderCurrentQuestion(); closeTopicsModal(); }
 
-  window.onload = loadReadmeAndInit;
+  window.onload = () => {
+    updateSoundButtonUI();
+    loadReadmeAndInit();
+  };
 </script>
 </body>
 </html>
