@@ -154,7 +154,6 @@
 
   <article class="quiz-card" id="quiz-card-element">
     <div class="meta-bar">
-      <!-- Короткий вид: Задача № -->
       <span class="topic-badge" id="ui-topic-tag">📌 Задача №1</span>
       <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
         <button id="fav-toggle-btn" class="pill-btn" onclick="toggleCurrentFavorite()" style="padding: 2px 6px; font-size: 0.9em;">☆</button>
@@ -162,7 +161,7 @@
       </div>
     </div>
     <div id="dynamic-content-root">
-      <div style="text-align: center; padding: 25px; color: var(--accent-cyan);">⏳ Авто-подключение к базе задач (READMY1.md.docx)...</div>
+      <div style="text-align: center; padding: 25px; color: var(--accent-cyan);">⏳ Авто-подключение к базе задач (READMY1.md)...</div>
     </div>
   </article>
 
@@ -174,7 +173,6 @@
   </footer>
 </div>
 
-<!-- Модальное окно каталога задач с поиском -->
 <div class="modal-overlay" id="topics-modal">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: sticky; top: 0; background: var(--bg-color); padding: 8px 0; z-index: 10;">
     <h2 style="margin: 0; font-size: 1.1em; color: var(--accent-cyan);">📚 Каталог задач и поиск</h2>
@@ -366,7 +364,6 @@
     isExamMode = false;
   }
 
-  // Парсер текстов документов с задачами
   function parseTextData(fullText) {
     const lines = fullText.split('\n').map(l => l.trim()).filter(Boolean);
     let parsedData = [];
@@ -441,7 +438,7 @@
     AppState.favoritesIds = SavedProgressState.favoritesIds || [];
 
     try {
-      const response = await fetch("READMY1.md.docx");
+      const response = await fetch("READMY1.md");
       if (!response.ok) throw new Error("Файл не найден");
       const arrayBuffer = await response.arrayBuffer();
       
@@ -458,12 +455,12 @@
         });
     } catch {
       try {
-        const respText = await fetch("READMY1.md.docx");
+        const respText = await fetch("READMY1.md");
         const text = await respText.text();
         RAW_EXCEL_TESTS = parseTextData(text);
         finishInitialization();
       } catch {
-        showError("Не удалось скачать файл READMY1.md.docx");
+        showError("Не удалось скачать файл READMY1.md");
       }
     }
   }
@@ -503,7 +500,6 @@
 
     const q = AppState.sessionQueue[AppState.currentIndex];
     
-    // Короткий вид шапки: "📌 Задача №X"
     const qNum = q.originalIndex ? q.originalIndex : (AppState.currentIndex + 1);
     const badgeText = `📌 Задача №${qNum}`;
     
