@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>PRO Нотариус 2026</title>
+  <title>PRO Задачи Нотариус 2026</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
@@ -26,23 +26,23 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     html, body {
-      width: 100%; height: 100dvh; margin: 0; padding: 0;
+      width: 100%; height: 100%; margin: 0; padding: 0;
       background-color: var(--bg-color); color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, sans-serif;
       overflow: hidden;
+      position: fixed; inset: 0;
+      -webkit-text-size-adjust: 100%;
     }
 
     #app-container {
-      display: flex; flex-direction: column; width: 100%; height: 100dvh;
-      padding-top: max(8px, env(safe-area-inset-top));
-      padding-bottom: max(10px, env(safe-area-inset-bottom));
-      padding-left: max(10px, env(safe-area-inset-left));
-      padding-right: max(10px, env(safe-area-inset-right));
+      display: flex; flex-direction: column; width: 100%; height: 100%;
+      padding-top: 4px; padding-bottom: 0px; padding-left: 6px; padding-right: 6px;
+      overflow: hidden;
     }
 
     .header-bar {
       display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 6px; background: var(--card-bg); border: 1px solid var(--border-color);
+      margin-bottom: 4px; background: var(--card-bg); border: 1px solid var(--border-color);
       padding: 6px 10px; border-radius: 12px; flex-shrink: 0; gap: 4px;
     }
 
@@ -65,27 +65,34 @@
 
     .global-progress-wrapper {
       background: var(--card-bg); border: 1px solid var(--border-color);
-      border-radius: 10px; padding: 6px 10px; margin-bottom: 6px; flex-shrink: 0;
+      border-radius: 10px; padding: 6px 10px; margin-bottom: 4px; flex-shrink: 0;
     }
     .progress-info-row { display: flex; justify-content: space-between; font-size: 0.7em; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
     .progress-bar-bg { width: 100%; height: 8px; background: #0f172a; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); }
     .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); border-radius: 4px; transition: width 0.4s ease; }
 
-    .dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 6px; flex-shrink: 0; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 4px; flex-shrink: 0; }
     .stat-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 6px 2px; text-align: center; cursor: pointer; }
     .stat-number { font-size: 1.1em; font-weight: 800; }
     .stat-label { font-size: 0.65em; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
 
     .quiz-card {
-      flex: 1; background: var(--card-bg); border: 1px solid var(--border-color);
-      border-radius: 14px; padding: 12px; margin-bottom: 6px;
-      display: flex; flex-direction: column; overflow-y: auto; min-height: 0;
+      flex: 1 1 0px; min-height: 0;
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: 14px; padding: 12px; margin-bottom: 4px;
+      display: flex; flex-direction: column; overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
 
-    .meta-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; }
-    .topic-badge { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; padding: 3px 8px; border-radius: 6px; font-size: 0.7em; font-weight: 700; }
-    .counter-badge { font-size: 0.75em; color: var(--text-muted); font-weight: 700; }
+    .meta-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; gap: 8px; }
+    
+    .topic-badge { 
+      background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); 
+      color: #93c5fd; padding: 4px 10px; border-radius: 6px; font-size: 0.75em; font-weight: 700; 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
+    }
+
+    .counter-badge { font-size: 0.75em; color: var(--text-muted); font-weight: 700; flex-shrink: 0; }
 
     .question-text { font-size: 0.95em; font-weight: 700; line-height: 1.35; color: #ffffff; margin-bottom: 12px; white-space: pre-line; }
     .answers-container { display: flex; flex-direction: column; gap: 6px; }
@@ -100,15 +107,16 @@
 
     .legal-analysis-box { margin-top: 10px; padding: 10px; background: #0f172a; border-left: 3px solid var(--accent-blue); border-radius: 8px; display: none; font-size: 0.82em; line-height: 1.35; }
 
-    .bottom-nav { display: flex; gap: 6px; flex-shrink: 0; }
+    .bottom-nav { display: flex; gap: 6px; flex-shrink: 0; margin-bottom: 0px; }
     .nav-btn { flex: 1; background: var(--accent-blue); color: #ffffff; border: none; padding: 12px 6px; border-radius: 10px; font-weight: 700; font-size: 0.85em; cursor: pointer; text-align: center; }
     .nav-btn.secondary { background: #334155; }
     .nav-btn.home-btn { background: #0284c7; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 19, 41, 0.96); backdrop-filter: blur(10px); z-index: 100; display: none; flex-direction: column; padding: 16px; overflow-y: auto; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 19, 41, 0.98); backdrop-filter: blur(10px); z-index: 100; display: none; flex-direction: column; padding: 16px; overflow-y: auto; }
     .topic-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
     .block-btn { background: #1e293b; border: 1px solid var(--border-color); color: var(--accent-cyan); padding: 8px; border-radius: 8px; text-align: center; font-size: 0.8em; font-weight: 700; cursor: pointer; }
-
+    
+    .search-bar-input { width: 100%; background: #1e293b; border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.85em; margin-bottom: 12px; }
     .result-screen { text-align: center; padding: 20px 10px; }
     .verdict-badge { display: inline-block; padding: 12px 34px; border-radius: 20px; font-size: 1.6em; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; }
     .verdict-badge.passed { background: var(--success-green); color: white; box-shadow: 0 0 15px rgba(16,185,129,0.4); }
@@ -119,12 +127,12 @@
 
 <div id="app-container">
   <header class="header-bar">
-    <div class="brand-title" onclick="openRandomTask()">⚖️ Нотариус Pro 🔀</div>
+    <div class="brand-title" onclick="openRandomTask()">⚖️ Задачи Pro 🔀</div>
     <div id="exam-timer-display">60:00</div>
-    <div style="display: flex; gap: 4px;">
-      <button class="pill-btn" id="sound-toggle-btn" onclick="toggleSound()">🔊 Звук</button>
-      <button class="pill-btn exam-btn" onclick="startOfficialExamMode()">⏱️ Билет (50+1)</button>
-      <button class="pill-btn" onclick="openTopicsModal()">📚 Темы</button>
+    <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+      <button id="sound-toggle-btn" class="pill-btn" onclick="AudioEngine.toggleMute()">🔊 Звук</button>
+      <button class="pill-btn exam-btn" onclick="startOfficialExamMode()">⏱️ Билет (50)</button>
+      <button class="pill-btn" onclick="openTopicsModal()">📚 Задачи</button>
       <button class="pill-btn" onclick="resetFullState()" style="color: var(--error-red);">🗑️ Сброс</button>
     </div>
   </header>
@@ -138,144 +146,184 @@
   </section>
 
   <section class="dashboard-grid">
-    <div class="stat-box"><div class="stat-number" id="ui-answered-count" style="color: var(--accent-cyan);">0</div><div class="stat-label">Отвечено</div></div>
-    <div class="stat-box"><div class="stat-number" id="ui-accuracy-rate" style="color: var(--success-green);">0%</div><div class="stat-label">Точность</div></div>
     <div class="stat-box" onclick="startErrorReviewSession()" style="border-color: var(--error-red);"><div class="stat-number" id="ui-errors-count" style="color: var(--error-red);">0</div><div class="stat-label">❌ Ошибки</div></div>
-    <div class="stat-box"><div class="stat-number" id="ui-progress-pos" style="color: var(--warning-amber);">1 / 0</div><div class="stat-label">Позиция</div></div>
+    <div class="stat-box" onclick="startFavoritesReviewSession()" style="border-color: var(--warning-amber);"><div class="stat-number" id="ui-fav-count" style="color: var(--warning-amber);">0</div><div class="stat-label">⭐ Избранное</div></div>
+    <div class="stat-box"><div class="stat-number" id="ui-accuracy-rate" style="color: var(--success-green);">0%</div><div class="stat-label">Точность</div></div>
+    <div class="stat-box"><div class="stat-number" id="ui-progress-pos" style="color: var(--accent-cyan);">1 / 0</div><div class="stat-label">Позиция</div></div>
   </section>
 
   <article class="quiz-card" id="quiz-card-element">
     <div class="meta-bar">
-      <span class="topic-badge" id="ui-topic-tag">📌 Синхронизация</span>
-      <span class="counter-badge" id="ui-question-counter">0 / 0</span>
+      <!-- Короткий вид: Задача № -->
+      <span class="topic-badge" id="ui-topic-tag">📌 Задача №1</span>
+      <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+        <button id="fav-toggle-btn" class="pill-btn" onclick="toggleCurrentFavorite()" style="padding: 2px 6px; font-size: 0.9em;">☆</button>
+        <span class="counter-badge" id="ui-question-counter">0 / 0</span>
+      </div>
     </div>
     <div id="dynamic-content-root">
-      <div style="text-align: center; padding: 25px; color: var(--accent-cyan);">⏳ Авто-подключение к базе вопросов (READMY1.md)...</div>
+      <div style="text-align: center; padding: 25px; color: var(--accent-cyan);">⏳ Авто-подключение к базе задач (READMY1.md.docx)...</div>
     </div>
   </article>
 
   <footer class="bottom-nav">
     <button class="nav-btn secondary" onclick="navigatePrevious()">⬅️ Назад</button>
-    <button class="nav-btn home-btn" onclick="restoreMainTestSession()">🏠 Все темы</button>
+    <button class="nav-btn home-btn" onclick="restoreMainTestSession()">🏠 Все задачи</button>
     <button class="nav-btn secondary" onclick="triggerShuffleBlock()">🔀 Блок</button>
     <button class="nav-btn" onclick="navigateNext()">Вперёд ➡️</button>
   </footer>
 </div>
 
+<!-- Модальное окно каталога задач с поиском -->
 <div class="modal-overlay" id="topics-modal">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; position: sticky; top: 0; background: var(--bg-color); padding: 8px 0; z-index: 10;">
-    <h2 style="margin: 0; font-size: 1.1em; color: var(--accent-cyan);">📚 Каталог разделов</h2>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: sticky; top: 0; background: var(--bg-color); padding: 8px 0; z-index: 10;">
+    <h2 style="margin: 0; font-size: 1.1em; color: var(--accent-cyan);">📚 Каталог задач и поиск</h2>
     <button class="pill-btn" onclick="closeTopicsModal()" style="background: var(--accent-blue); padding: 8px 14px;">К тесту</button>
   </div>
+  <input type="text" id="search-input" class="search-bar-input" placeholder="🔍 Поиск по условию задач..." oninput="filterTopicsAndQuestions(this.value)">
   <div id="topics-list-container"></div>
 </div>
 
 <script>
-  let isSoundEnabled = JSON.parse(localStorage.getItem('notary_sound_enabled')) !== false;
-
-  function toggleSound() {
-    isSoundEnabled = !isSoundEnabled;
-    localStorage.setItem('notary_sound_enabled', JSON.stringify(isSoundEnabled));
-    updateSoundButtonUI();
-  }
-
-  function updateSoundButtonUI() {
-    const btn = document.getElementById('sound-toggle-btn');
-    if (btn) {
-      btn.innerText = isSoundEnabled ? '🔊 Звук' : '🔇 Без звука';
-      btn.style.opacity = isSoundEnabled ? '1' : '0.6';
-    }
-  }
-
   const AudioEngine = {
     ctx: null,
+    isMuted: false,
     init() {
       if (!this.ctx) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (AudioCtx) this.ctx = new AudioCtx();
       }
     },
+    toggleMute() {
+      this.isMuted = !this.isMuted;
+      const btn = document.getElementById('sound-toggle-btn');
+      if (btn) btn.innerText = this.isMuted ? "🔇 Без звука" : "🔊 Звук";
+      return this.isMuted;
+    },
     playCorrect() {
-      if (!isSoundEnabled) return;
+      if (this.isMuted) return;
       try {
         this.init();
         if (!this.ctx) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
+        osc.connect(gain); gain.connect(this.ctx.destination);
         osc.frequency.setValueAtTime(587.33, this.ctx.currentTime);
         osc.frequency.setValueAtTime(880, this.ctx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.25);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.25);
       } catch(e) {}
     },
     playWrong() {
-      if (!isSoundEnabled) return;
+      if (this.isMuted) return;
       try {
         this.init();
         if (!this.ctx) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
+        osc.connect(gain); gain.connect(this.ctx.destination);
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(160, this.ctx.currentTime);
         gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.3);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.3);
       } catch(e) {}
     }
   };
 
   let isTransitioning = false; 
-
   let RAW_EXCEL_TESTS = [];
-  let TASKS_DATABASE = [];
-  const DEFAULT_STATE = { currentIndex: 0, totalAnswered: 0, correctCount: 0, errorIds: [], sessionQueue: [] };
+  const DEFAULT_STATE = { currentIndex: 0, totalAnswered: 0, correctCount: 0, errorIds: [], favoritesIds: [], sessionQueue: [] };
   
   let AppState = { ...DEFAULT_STATE };
-  let SavedProgressState = JSON.parse(localStorage.getItem('notary_stats_save_v1')) || { totalAnswered: 0, correctCount: 0, errorIds: [] };
-  let GlobalMasteredIds = JSON.parse(localStorage.getItem('notary_global_mastered_v3')) || [];
+  let SavedProgressState = JSON.parse(localStorage.getItem('notary_tasks_stats_save_v1')) || { totalAnswered: 0, correctCount: 0, errorIds: [], favoritesIds: [] };
+  let GlobalMasteredIds = JSON.parse(localStorage.getItem('notary_tasks_global_mastered_v1')) || [];
   
   let isExamMode = false;
   let examCountdown = null;
   let examTimeLeft = 3600; 
-  let examScore = { testPoints: 0, taskPoint: 0, argPoints: 0 };
+  let examScore = { testPoints: 0 };
 
   function syncStateToStorage() {
     SavedProgressState.totalAnswered = AppState.totalAnswered;
     SavedProgressState.correctCount = AppState.correctCount;
     SavedProgressState.errorIds = AppState.errorIds;
-    localStorage.setItem('notary_stats_save_v1', JSON.stringify(SavedProgressState));
-    localStorage.setItem('notary_global_mastered_v3', JSON.stringify(GlobalMasteredIds));
+    SavedProgressState.favoritesIds = AppState.favoritesIds;
+    localStorage.setItem('notary_tasks_stats_save_v1', JSON.stringify(SavedProgressState));
+    localStorage.setItem('notary_tasks_global_mastered_v1', JSON.stringify(GlobalMasteredIds));
     renderDashboardUI();
   }
 
   function resetFullState() {
-    if (confirm("Сбросить статистику круга? Общий вечный прогресс не пострадает!")) {
+    if (confirm("Сбросить статистику текущего круга? Общий вечный прогресс не пострадает!")) {
       clearInterval(examCountdown);
       isExamMode = false;
       isTransitioning = false;
       document.getElementById('exam-timer-display').style.display = "none";
-      AppState = { ...DEFAULT_STATE };
-      SavedProgressState = { totalAnswered: 0, correctCount: 0, errorIds: [] };
+      AppState = { ...DEFAULT_STATE, favoritesIds: SavedProgressState.favoritesIds || [] };
+      SavedProgressState.totalAnswered = 0;
+      SavedProgressState.correctCount = 0;
+      SavedProgressState.errorIds = [];
       buildSessionQueue();
       syncStateToStorage();
       renderCurrentQuestion();
     }
   }
 
+  function toggleCurrentFavorite() {
+    if (!AppState.sessionQueue || AppState.sessionQueue.length === 0) return;
+    const q = AppState.sessionQueue[AppState.currentIndex];
+    if (!q) return;
+
+    if (!AppState.favoritesIds) AppState.favoritesIds = [];
+    const idx = AppState.favoritesIds.indexOf(q.id);
+    if (idx > -1) {
+      AppState.favoritesIds.splice(idx, 1);
+    } else {
+      AppState.favoritesIds.push(q.id);
+    }
+    syncStateToStorage();
+    updateFavoriteButtonState();
+  }
+
+  function updateFavoriteButtonState() {
+    const btn = document.getElementById('fav-toggle-btn');
+    if (!btn || !AppState.sessionQueue || AppState.sessionQueue.length === 0) return;
+    const q = AppState.sessionQueue[AppState.currentIndex];
+    if (q && AppState.favoritesIds && AppState.favoritesIds.includes(q.id)) {
+      btn.innerText = "⭐";
+      btn.style.color = "var(--warning-amber)";
+    } else {
+      btn.innerText = "☆";
+      btn.style.color = "var(--text-main)";
+    }
+    document.getElementById('ui-fav-count').innerText = (AppState.favoritesIds || []).length;
+  }
+
+  function startFavoritesReviewSession() {
+    if (!AppState.favoritesIds || AppState.favoritesIds.length === 0) { alert("Список избранного пуст! Нажимайте звездочку у сложных задач."); return; }
+    let favQuestions = [...RAW_EXCEL_TESTS].filter(q => AppState.favoritesIds.includes(q.id));
+    AppState.sessionQueue = favQuestions.map(q => ({ ...q, topic: "⭐ Избранное" }));
+    AppState.currentIndex = 0;
+    renderCurrentQuestion();
+  }
+
+  function startErrorReviewSession() {
+    if (!AppState.errorIds || AppState.errorIds.length === 0) { alert("Список ошибок пуст! Отличный результат."); return; }
+    let errorQuestions = [...RAW_EXCEL_TESTS].filter(q => AppState.errorIds.includes(q.id));
+    AppState.sessionQueue = errorQuestions.map(q => ({ ...q, topic: "❌ Ошибки" }));
+    AppState.currentIndex = 0;
+    renderCurrentQuestion();
+  }
+
   function startOfficialExamMode() {
-    if (RAW_EXCEL_TESTS.length === 0) { alert("База данных тестов еще подгружается!"); return; }
+    if (RAW_EXCEL_TESTS.length === 0) { alert("База данных задач еще подгружается!"); return; }
     
     isExamMode = true;
     isTransitioning = false;
     examTimeLeft = 3600; 
-    examScore = { testPoints: 0, taskPoint: 0, argPoints: 0 };
+    examScore = { testPoints: 0 };
 
     document.getElementById('exam-timer-display').style.display = "block";
     clearInterval(examCountdown);
@@ -291,10 +339,8 @@
       }
     }, 1000);
 
-    let shuffledTests = [...RAW_EXCEL_TESTS].sort(() => Math.random() - 0.5).slice(0, 50);
-    let examQueue = shuffledTests.map((q, idx) => ({ ...q, isTaskItem: false, topic: `⏱️ Экзамен: Задача ${idx + 1}` }));
-
-    AppState.sessionQueue = examQueue;
+    let shuffledTests = [...RAW_EXCEL_TESTS].sort(() => Math.random() - 0.5).slice(0, Math.min(50, RAW_EXCEL_TESTS.length));
+    AppState.sessionQueue = shuffledTests;
     AppState.currentIndex = 0;
     renderCurrentQuestion();
   }
@@ -304,50 +350,23 @@
     document.getElementById('exam-timer-display').style.display = "none";
     isTransitioning = false;
     
-    let totalPoints = examScore.testPoints + examScore.taskPoint + examScore.argPoints;
-    let isPassed = totalPoints >= 45; 
+    let totalPoints = examScore.testPoints;
+    let isPassed = totalPoints >= (AppState.sessionQueue.length * 0.8); 
 
     const root = document.getElementById('dynamic-content-root');
-    document.getElementById('ui-topic-tag').innerText = "🏁 Результаты билета";
+    document.getElementById('ui-topic-tag').innerText = "🏁 Экзамен завершен";
     
     root.innerHTML = `
       <div class="result-screen">
         <div class="verdict-badge ${isPassed ? 'passed' : 'failed'}">${isPassed ? 'СДАЛ' : 'НЕ СДАН'}</div>
-        <h3 style="margin: 10px 0;">Набранный балл: ${totalPoints} из 60</h3>
-        <div style="text-align: left; background: #0f172a; padding: 14px; border-radius: 10px; font-size: 0.88em; margin-bottom: 15px; line-height:1.4;">
-          <p>🔹 Правильные ответы: <b style="color:var(--accent-cyan);">${examScore.testPoints}</b></p>
-        </div>
+        <h3 style="margin: 10px 0;">Правильных ответов: ${totalPoints} из ${AppState.sessionQueue.length}</h3>
         <button class="nav-btn home-btn" style="width: 100%; padding:14px;" onclick="isExamMode=false; buildSessionQueue(); renderCurrentQuestion();">Вернуться к тренировке</button>
       </div>
     `;
     isExamMode = false;
   }
 
-  function cleanQuestionData(q) {
-    if (!q || !q.options) return q;
-    let extractedExplanation = "";
-    q.options = q.options.map(opt => {
-      const match = opt.match(/^(.*?)\s*(Пояснени[яе]?:?[\s\S]*)$/i);
-      if (match) {
-        if (match[2]) {
-          extractedExplanation += (extractedExplanation ? "\n" : "") + match[2].trim();
-        }
-        return match[1].trim();
-      }
-      return opt;
-    });
-    if (extractedExplanation) {
-      q.legalBasis = q.legalBasis || {};
-      if (q.legalBasis.explanation) {
-        q.legalBasis.explanation += "\n" + extractedExplanation;
-      } else {
-        q.legalBasis.explanation = extractedExplanation;
-      }
-    }
-    return q;
-  }
-
-  // Сверхгибкий парсер, поддерживающий `<Задача№>`, `<Задача>`, варианты и ответы независимо от пробелов
+  // Парсер текстов документов с задачами
   function parseTextData(fullText) {
     const lines = fullText.split('\n').map(l => l.trim()).filter(Boolean);
     let parsedData = [];
@@ -356,22 +375,22 @@
     lines.forEach((line) => {
       const normalized = line.replace(/\s+/g, '');
 
-      if (normalized.startsWith('<Задача№>')) {
+      if (normalized.startsWith('<Задача№>') || normalized.startsWith('<Задача№>:')) {
         if (currentQ && currentQ.options.length > 0) {
-          cleanQuestionData(currentQ);
           parsedData.push(currentQ);
         }
         const matchNum = line.match(/\d+/);
-        const qId = matchNum ? parseInt(matchNum[0], 10) : (1000 + parsedData.length);
+        const qNum = matchNum ? parseInt(matchNum[0], 10) : (parsedData.length + 1);
         currentQ = { 
-          id: qId,
-          topic: "Задачи нотариуса",
+          id: 2000 + parsedData.length,
+          originalIndex: qNum,
+          topic: `Задача №${qNum}`,
           title: "", 
           question: "",
           options: [], 
           correct: 0,
           correctIndex: 0,
-          legalBasis: { rule: "Законодательство РФ о нотариате", logic: "Материал квалификационного экзамена." }
+          legalBasis: { rule: "Законодательство РФ о нотариате", logic: "Материал квалификационного экзамена по задачам." }
         };
       } else if (line.startsWith('<Задача>:')) {
         const text = line.replace(/^<Задача>:\s*/, '');
@@ -380,13 +399,13 @@
           currentQ.question = text;
         }
       } else if (normalized.startsWith('<Вариантыответа>:')) {
-        // Пропускаем заголовок
+        // Пропускаем
       } else if (/^<\d+>:/.test(normalized) || /^<\d+>/.test(line)) {
         const optText = line.replace(/^<\d+>:\s*/, '').replace(/^<\d+>\s*/, '');
         if (currentQ) {
           currentQ.options.push(optText);
         }
-      } else if (line.startsWith('<Правильный ответ>:')) {
+      } else if (line.startsWith('<Правильный ответ>:') || line.startsWith('Правильный ответ>:')) {
         const matchNum = line.match(/\d+/);
         if (matchNum && currentQ) {
           currentQ.correct = parseInt(matchNum[0], 10) - 1;
@@ -410,7 +429,6 @@
     });
 
     if (currentQ && currentQ.options.length > 0) {
-      cleanQuestionData(currentQ);
       parsedData.push(currentQ);
     }
     return parsedData;
@@ -419,12 +437,12 @@
   async function loadReadmeAndInit() {
     AppState.totalAnswered = SavedProgressState.totalAnswered;
     AppState.correctCount = SavedProgressState.correctCount;
-    AppState.errorIds = SavedProgressState.errorIds;
+    AppState.errorIds = SavedProgressState.errorIds || [];
+    AppState.favoritesIds = SavedProgressState.favoritesIds || [];
 
     try {
-      const response = await fetch("READMY1.md");
+      const response = await fetch("READMY1.md.docx");
       if (!response.ok) throw new Error("Файл не найден");
-      
       const arrayBuffer = await response.arrayBuffer();
       
       mammoth.extractRawText({ arrayBuffer: arrayBuffer })
@@ -432,29 +450,27 @@
           RAW_EXCEL_TESTS = parseTextData(result.value);
           finishInitialization();
         })
-        .catch(err => {
+        .catch(() => {
           response.text().then(text => {
             RAW_EXCEL_TESTS = parseTextData(text);
             finishInitialization();
-          }).catch(e => showError("Ошибка чтения документа."));
+          }).catch(() => showError("Ошибка чтения документа."));
         });
-    } catch (error) {
+    } catch {
       try {
-        const respText = await fetch("READMY1.md");
+        const respText = await fetch("READMY1.md.docx");
         const text = await respText.text();
         RAW_EXCEL_TESTS = parseTextData(text);
         finishInitialization();
-      } catch(e) {
-        showError("Не удалось скачать файл READMY1.md");
+      } catch {
+        showError("Не удалось скачать файл READMY1.md.docx");
       }
     }
   }
 
   function showError(msg) {
     const root = document.getElementById('dynamic-content-root');
-    if (root) {
-      root.innerHTML = `<div style="text-align: center; padding: 25px; color: var(--error-red);">❌ ${msg}</div>`;
-    }
+    if (root) root.innerHTML = `<div style="text-align: center; padding: 25px; color: var(--error-red);">❌ ${msg}</div>`;
   }
 
   function finishInitialization() {
@@ -466,9 +482,9 @@
     let tests = filterTopic ? RAW_EXCEL_TESTS.filter(q => q.topic === filterTopic) : [...RAW_EXCEL_TESTS];
 
     if (tests.length > 0) {
-      AppState.sessionQueue = tests.sort(() => Math.random() - 0.5);
+      AppState.sessionQueue = [...tests].sort(() => Math.random() - 0.5);
     } else {
-      AppState.sessionQueue = [{ id: 0, topic: "Инфо", question: "В базе данных нет вопросов.", options: ["Ок"], correct: 0, legalBasis: {rule: "-", logic: "-"} }];
+      AppState.sessionQueue = [{ id: 0, originalIndex: 1, topic: "Задача №1", question: "В базе данных нет задач.", options: ["Ок"], correct: 0, legalBasis: {rule: "-", logic: "-"} }];
     }
     
     AppState.currentIndex = 0;
@@ -480,23 +496,25 @@
     renderCurrentQuestion();
   }
 
-  function startErrorReviewSession() {
-    if (AppState.errorIds.length === 0) { alert("Список ошибок пуст!"); return; }
-    let errorQuestions = [...RAW_EXCEL_TESTS].filter(q => AppState.errorIds.includes(q.id));
-    AppState.sessionQueue = errorQuestions.map(q => ({ ...q, topic: "❌ Проработка ошибок" }));
-    AppState.currentIndex = 0;
-    renderCurrentQuestion();
-  }
-
   function renderCurrentQuestion() {
     isTransitioning = false; 
     if (!AppState.sessionQueue || AppState.sessionQueue.length === 0) return;
     if (AppState.currentIndex >= AppState.sessionQueue.length) AppState.currentIndex = 0;
 
     const q = AppState.sessionQueue[AppState.currentIndex];
-    document.getElementById('ui-topic-tag').innerText = q.topic || "Раздел";
+    
+    // Короткий вид шапки: "📌 Задача №X"
+    const qNum = q.originalIndex ? q.originalIndex : (AppState.currentIndex + 1);
+    const badgeText = `📌 Задача №${qNum}`;
+    
+    const topicBadgeEl = document.getElementById('ui-topic-tag');
+    topicBadgeEl.innerText = badgeText;
+    topicBadgeEl.title = badgeText;
+
     document.getElementById('ui-question-counter').innerText = `${AppState.currentIndex + 1} / ${AppState.sessionQueue.length}`;
     
+    updateFavoriteButtonState();
+
     const root = document.getElementById('dynamic-content-root');
     let optionsHTML = q.options.map((opt, idx) => `
       <button class="opt-button" onclick="handleOptionSelect(${idx}, ${q.correct}, ${q.id}, this)">
@@ -508,11 +526,11 @@
       <div class="question-text">${q.question || q.title}</div>
       <div class="answers-container">${optionsHTML}</div>
       <button class="pill-btn" style="margin-top: 12px; width: 100%; text-align: center; padding:8px;" onclick="toggleLegalHint()">
-        ⚖ Развёрнутое правовое обоснование
+        ⚖️ Развёрнутое правовое обоснование
       </button>
       <div id="legal-hint-card" class="legal-analysis-box">
         <p style="margin: 0 0 4px 0;"><b>📜 Обоснование:</b> ${q.legalBasis ? q.legalBasis.rule : "Законодательство РФ"}</p>
-        ${q.legalBasis && q.legalBasis.explanation ? `<p style="margin: 6px 0 0 0; border-top: 1px dashed var(--border-color); padding-top: 6px; white-space: pre-line;"><b>💡 ${q.legalBasis.explanation}</b></p>` : ''}
+        ${q.legalBasis && q.legalBasis.logic ? `<p style="margin: 6px 0 0 0; border-top: 1px dashed var(--border-color); padding-top: 6px;"><b>💡 ${q.legalBasis.logic}</b></p>` : ''}
       </div>
     `;
     
@@ -522,7 +540,7 @@
 
   function handleOptionSelect(selectedIdx, correctIdx, qId, btnElement) {
     if (isTransitioning) return;
-    isTransitioning = true;
+    isTransitioning = true; 
 
     selectedIdx = Number(selectedIdx);
     correctIdx = Number(correctIdx);
@@ -535,9 +553,10 @@
       if (btnElement) btnElement.classList.add('correct');
       AudioEngine.playCorrect();
       
-      if (!GlobalMasteredIds.includes(qId)) {
-        GlobalMasteredIds.push(qId);
-      }
+      if (!GlobalMasteredIds.includes(qId)) GlobalMasteredIds.push(qId);
+      
+      const errIdx = AppState.errorIds.indexOf(qId);
+      if (errIdx > -1) AppState.errorIds.splice(errIdx, 1);
 
       if (isExamMode) {
         examScore.testPoints += 1; 
@@ -577,8 +596,8 @@
   function triggerShuffleBlock() { buildSessionQueue(); renderCurrentQuestion(); }
 
   function renderDashboardUI() {
-    document.getElementById('ui-answered-count').innerText = AppState.totalAnswered;
-    document.getElementById('ui-errors-count').innerText = AppState.errorIds.length;
+    document.getElementById('ui-errors-count').innerText = (AppState.errorIds || []).length;
+    document.getElementById('ui-fav-count').innerText = (AppState.favoritesIds || []).length;
     let accuracy = AppState.totalAnswered > 0 ? Math.round((AppState.correctCount / AppState.totalAnswered) * 100) : 0;
     document.getElementById('ui-accuracy-rate').innerText = accuracy + '%';
     document.getElementById('ui-progress-pos').innerText = `${AppState.currentIndex + 1} / ${AppState.sessionQueue.length}`;
@@ -595,37 +614,65 @@
     const pool = RAW_EXCEL_TESTS;
     if (pool.length === 0) return;
     let chosen = pool[Math.floor(Math.random() * pool.length)];
-    AppState.sessionQueue.splice(AppState.currentIndex + 1, 0, { ...chosen, topic: "🔀 Случайный вопрос" });
+    AppState.sessionQueue.splice(AppState.currentIndex + 1, 0, { ...chosen, topic: "🔀 Случайная задача" });
     navigateNext();
   }
 
   function openTopicsModal() {
-    const topicsMap = {};
-    RAW_EXCEL_TESTS.forEach(q => { if (!topicsMap[q.topic]) topicsMap[q.topic] = 0; topicsMap[q.topic]++; });
-
-    const container = document.getElementById('topics-list-container');
-    let html = '';
-
-    for (let t in topicsMap) {
-      html += `
-        <div class="topic-card">
-          <div style="font-weight: 700; font-size: 0.9em; color: var(--accent-cyan);">${t}</div>
-          <div style="font-size: 0.75em; color: var(--text-muted); margin-top: 2px;">Доступно вопросов: ${topicsMap[t]}</div>
-          <button class="block-btn" onclick="selectTopicBlock('${t}')" style="width: 100%; margin-top:6px;">Запустить раздел</button>
-        </div>
-      `;
-    }
-    container.innerHTML = html;
+    renderTopicsList(RAW_EXCEL_TESTS);
     document.getElementById('topics-modal').style.display = 'flex';
   }
-
   function closeTopicsModal() { document.getElementById('topics-modal').style.display = 'none'; }
-  function selectTopicBlock(t) { buildSessionQueue(t); renderCurrentQuestion(); closeTopicsModal(); }
 
-  window.onload = () => {
-    updateSoundButtonUI();
-    loadReadmeAndInit();
-  };
+  function renderTopicsList(questionsPool) {
+    const container = document.getElementById('topics-list-container');
+    let html = `
+      <div class="topic-card">
+        <div style="font-weight: 700; font-size: 0.9em; color: var(--accent-cyan);">📚 Все задачи (${questionsPool.length})</div>
+        <button class="block-btn" onclick="selectTopicBlock(null)" style="width: 100%; margin-top:6px;">Запустить весь список</button>
+      </div>
+    `;
+    container.innerHTML = html;
+  }
+
+  function filterTopicsAndQuestions(keyword) {
+    const term = keyword.toLowerCase().trim();
+    if (!term) {
+      renderTopicsList(RAW_EXCEL_TESTS);
+      return;
+    }
+    let matched = RAW_EXCEL_TESTS.filter(q => (q.question && q.question.toLowerCase().includes(term)) || (q.topic && q.topic.toLowerCase().includes(term)));
+    const container = document.getElementById('topics-list-container');
+    let html = `<div style="font-size: 0.8em; color: var(--accent-cyan); margin-bottom:8px;">Найдено задач: ${matched.length}</div>`;
+    
+    matched.slice(0, 30).forEach((q) => {
+      html += `
+        <div class="topic-card" onclick="startFilteredQuestion(${q.id})" style="cursor:pointer;">
+          <div style="font-size: 0.7em; color: var(--text-muted);">Задача №${q.originalIndex}</div>
+          <div style="font-weight: 600; font-size: 0.82em; color: #fff; margin-top: 2px;">${q.question.substring(0, 90)}...</div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  function startFilteredQuestion(qId) {
+    let targetQ = RAW_EXCEL_TESTS.find(q => q.id === qId);
+    if (targetQ) {
+      AppState.sessionQueue = [targetQ];
+      AppState.currentIndex = 0;
+      closeTopicsModal();
+      renderCurrentQuestion();
+    }
+  }
+
+  function selectTopicBlock(t) { 
+    buildSessionQueue(t); 
+    renderCurrentQuestion(); 
+    closeTopicsModal(); 
+  }
+
+  window.onload = loadReadmeAndInit;
 </script>
 </body>
 </html>
