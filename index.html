@@ -167,18 +167,21 @@
 
   <footer class="bottom-nav">
     <button class="nav-btn secondary" onclick="navigatePrevious()">⬅️ Назад</button>
-    <button class="nav-btn home-btn" onclick="restoreMainTestSession()">🏠 Все задачи</button>
+    <button class="nav-btn home-btn" onclick="openAllTasksMenu()">🏠 Все задачи</button>
     <button class="nav-btn secondary" onclick="triggerShuffleBlock()">🔀 Блок</button>
     <button class="nav-btn" onclick="navigateNext()">Вперёд ➡️</button>
   </footer>
 </div>
 
+<!-- Модальное окно каталога задач и выбора режима -->
 <div class="modal-overlay" id="topics-modal">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: sticky; top: 0; background: var(--bg-color); padding: 8px 0; z-index: 10;">
-    <h2 style="margin: 0; font-size: 1.1em; color: var(--accent-cyan);">📚 Каталог задач и поиск</h2>
+    <h2 id="modal-title-text" style="margin: 0; font-size: 1.1em; color: var(--accent-cyan);">📚 Каталог задач и поиск</h2>
     <button class="pill-btn" onclick="closeTopicsModal()" style="background: var(--accent-blue); padding: 8px 14px;">К тесту</button>
   </div>
-  <input type="text" id="search-input" class="search-bar-input" placeholder="🔍 Поиск по условию задач..." oninput="filterTopicsAndQuestions(this.value)">
+  <div id="modal-search-wrapper">
+    <input type="text" id="search-input" class="search-bar-input" placeholder="🔍 Поиск по условию задач..." oninput="filterTopicsAndQuestions(this.value)">
+  </div>
   <div id="topics-list-container"></div>
 </div>
 
@@ -358,7 +361,7 @@
       <div class="result-screen">
         <div class="verdict-badge ${isPassed ? 'passed' : 'failed'}">${isPassed ? 'СДАЛ' : 'НЕ СДАН'}</div>
         <h3 style="margin: 10px 0;">Правильных ответов: ${totalPoints} из ${AppState.sessionQueue.length}</h3>
-        <button class="nav-btn home-btn" style="width: 100%; padding:14px;" onclick="isExamMode=false; buildSessionQueue(); renderCurrentQuestion();">Вернуться к тренировке</button>
+        <button class="nav-btn home-btn" style="width: 100%; padding:14px;" onclick="isExamMode=false; buildSessionQueue('sequential'); renderCurrentQuestion();">Вернуться к тренировке</button>
       </div>
     `;
     isExamMode = false;
@@ -471,25 +474,64 @@
   }
 
   function finishInitialization() {
-    buildSessionQueue();
+    buildSessionQueue('sequential');
     renderCurrentQuestion();
   }
 
-  function buildSessionQueue(filterTopic = null) {
-    let tests = filterTopic ? RAW_EXCEL_TESTS.filter(q => q.topic === filterTopic) : [...RAW_EXCEL_TESTS];
+  function buildSessionQueue(mode = 'sequential', startIdx = 0) {
+    let tests = [...RAW_EXCEL_TESTS];
 
     if (tests.length > 0) {
-      AppState.sessionQueue = [...tests].sort(() => Math.random() - 0.5);
+      if (mode === 'random') {
+        AppState.sessionQueue = [...tests].sort(() => Math.random() - 0.5);
+        AppState.currentIndex = 0;
+      } else {
+        // По порядку (sequential)
+        AppState.sessionQueue = tests;
+        AppState.currentIndex = Math.max(0, Math.min(startIdx, tests.length - 1));
+      }
     } else {
       AppState.sessionQueue = [{ id: 0, originalIndex: 1, topic: "Задача №1", question: "В базе данных нет задач.", options: ["Ок"], correct: 0, legalBasis: {rule: "-", logic: "-"} }];
+      AppState.currentIndex = 0;
     }
-    
-    AppState.currentIndex = 0;
     syncStateToStorage();
   }
 
-  function restoreMainTestSession() {
-    buildSessionQueue();
+  function openAllTasksMenu() {
+    const container = document.getElementById('topics-list-container');
+    document.getElementById('modal-title-text').innerText = "🏠 Выбор режима задач";
+    document.getElementById('modal-search-wrapper').style.display = 'none';
+
+    let html = `
+      <div class="topic-card" style="border-color: var(--accent-cyan); background: rgba(56,189,248,0.05);">
+        <div style="font-weight: 800; font-size: 0.9em; color: var(--accent-cyan); margin-bottom: 8px;">⚙️ Режим прохождения всей базы (${RAW_EXCEL_TESTS.length} задач):</div>
+        <div style="display: flex; gap: 8px;">
+          <button class="block-btn" style="flex:1; background: var(--accent-blue); color:#fff;" onclick="selectModeAndStart('sequential', 0)">📌 По порядку</button>
+          <button class="block-btn" style="flex:1;" onclick="selectModeAndStart('random', 0)">🔀 Вразброс (Перемешка)</button>
+        </div>
+      </div>
+      <div style="font-weight: 700; font-size: 0.85em; color: var(--text-muted); margin: 12px 0 6px 4px;">📂 Или выберите конкретную задачу по номеру:</div>
+    `;
+
+    RAW_EXCEL_TESTS.forEach((q, idx) => {
+      html += `
+        <div class="topic-card" onclick="selectModeAndStart('sequential', ${idx})" style="cursor:pointer; padding: 8px 12px; margin-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.75em; font-weight: 700; color: var(--accent-cyan);">Задача №${q.originalIndex || (idx + 1)}</span>
+            <span style="font-size: 0.7em; color: var(--text-muted);">#${idx + 1}</span>
+          </div>
+          <div style="font-weight: 600; font-size: 0.82em; color: #fff; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${q.question}</div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+    document.getElementById('topics-modal').style.display = 'flex';
+  }
+
+  function selectModeAndStart(mode, index) {
+    buildSessionQueue(mode, index);
+    closeTopicsModal();
     renderCurrentQuestion();
   }
 
@@ -589,7 +631,10 @@
     renderCurrentQuestion();
   }
 
-  function triggerShuffleBlock() { buildSessionQueue(); renderCurrentQuestion(); }
+  function triggerShuffleBlock() { 
+    buildSessionQueue('random'); 
+    renderCurrentQuestion(); 
+  }
 
   function renderDashboardUI() {
     document.getElementById('ui-errors-count').innerText = (AppState.errorIds || []).length;
@@ -615,6 +660,8 @@
   }
 
   function openTopicsModal() {
+    document.getElementById('modal-title-text').innerText = "📚 Каталог задач и поиск";
+    document.getElementById('modal-search-wrapper').style.display = 'block';
     renderTopicsList(RAW_EXCEL_TESTS);
     document.getElementById('topics-modal').style.display = 'flex';
   }
@@ -625,7 +672,7 @@
     let html = `
       <div class="topic-card">
         <div style="font-weight: 700; font-size: 0.9em; color: var(--accent-cyan);">📚 Все задачи (${questionsPool.length})</div>
-        <button class="block-btn" onclick="selectTopicBlock(null)" style="width: 100%; margin-top:6px;">Запустить весь список</button>
+        <button class="block-btn" onclick="selectModeAndStart('sequential', 0)" style="width: 100%; margin-top:6px;">Запустить по порядку</button>
       </div>
     `;
     container.innerHTML = html;
@@ -642,30 +689,15 @@
     let html = `<div style="font-size: 0.8em; color: var(--accent-cyan); margin-bottom:8px;">Найдено задач: ${matched.length}</div>`;
     
     matched.slice(0, 30).forEach((q) => {
+      let realIndex = RAW_EXCEL_TESTS.findIndex(item => item.id === q.id);
       html += `
-        <div class="topic-card" onclick="startFilteredQuestion(${q.id})" style="cursor:pointer;">
+        <div class="topic-card" onclick="selectModeAndStart('sequential', ${realIndex})" style="cursor:pointer;">
           <div style="font-size: 0.7em; color: var(--text-muted);">Задача №${q.originalIndex}</div>
           <div style="font-weight: 600; font-size: 0.82em; color: #fff; margin-top: 2px;">${q.question.substring(0, 90)}...</div>
         </div>
       `;
     });
     container.innerHTML = html;
-  }
-
-  function startFilteredQuestion(qId) {
-    let targetQ = RAW_EXCEL_TESTS.find(q => q.id === qId);
-    if (targetQ) {
-      AppState.sessionQueue = [targetQ];
-      AppState.currentIndex = 0;
-      closeTopicsModal();
-      renderCurrentQuestion();
-    }
-  }
-
-  function selectTopicBlock(t) { 
-    buildSessionQueue(t); 
-    renderCurrentQuestion(); 
-    closeTopicsModal(); 
   }
 
   window.onload = loadReadmeAndInit;
